@@ -99,13 +99,20 @@ class DataStream:
             )
 
     def output_pipeline(self, nb: int, plugin: ExportPlugin) -> None:
+        if nb < 0:
+            raise ValueError("Number of items cannot be negative")
+
+        if nb == 0:
+            return
+
         for processor in self._processors:
             output_data: list[tuple[int, str]] = []
 
             for _ in range(min(nb, len(processor._data))):
                 output_data.append(processor.output())
 
-            plugin.process_output(output_data)
+            if output_data:
+                plugin.process_output(output_data)
 
 
 if __name__ == "__main__":
